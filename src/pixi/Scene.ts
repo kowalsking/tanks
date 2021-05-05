@@ -1,18 +1,30 @@
-import { Application } from 'pixi.js'
+import { Application, Container, DisplayObject, Sprite, Texture } from 'pixi.js'
 
-class Scene extends Application {
-  private width: number
-  private height: number
-
-  constructor (width: number, height: number) {
+export class Scene extends Application {
+  constructor (private width: number, private height: number) {
     super()
     this.width = width
     this.height = height
     this.view.width = this.width
     this.view.height = this.height
     document.body.append(this.view)
-    console.log(this.view)
+  }
+
+  public showLoadingScreen (screen: Texture) {
+    const loadingScreen = new Sprite(screen)
+    const container = new Container()
+    // loadingScreen.width = this.view.width
+    // loadingScreen.height = this.view.height
+    // loadingScreen.anchor.set(0.5)
+    // loadingScreen.x = this.width / 2
+    // loadingScreen.y = this.height / 2
+    console.log(loadingScreen)
+    container.addChild(loadingScreen)
+    this.append(container)
+  }
+
+  private append (child: DisplayObject) {
+    this.stage.addChild(child)
   }
 }
 
-export const startPixi = (): Scene => new Scene(1024, 768)
