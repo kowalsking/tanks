@@ -40,8 +40,8 @@ export default class Game {
   }
 
   private createTicker () {
-    this.scene.ticker.add(() => {
-      this.tank.moveUp()
+    this.scene.ticker.add((delta) => {
+      // this.tank.moveUp()
     })
   }
 
