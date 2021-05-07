@@ -40,7 +40,6 @@ export default class LoadingScreen extends Container {
   }
 
   public hide () {
-    this.screen.alpha = 0
-    this.button.alpha = 0
+    this.removeChildren()
   }
 }
