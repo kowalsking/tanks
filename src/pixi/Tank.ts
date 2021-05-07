@@ -1,5 +1,5 @@
 import { Container, Sprite, Texture } from 'pixi.js'
-
+import { Turn } from '../constants/rotation'
 export default class Tank extends Container {
   private tank = new Sprite()
 
@@ -38,21 +38,21 @@ export default class Tank extends Container {
 
   public moveUp () {
     this.tank.y -= 3
-    this.tank.angle = 0
+    this.tank.angle = Turn.UP
   }
 
   private moveDown () {
     this.tank.y += 3
-    this.tank.angle = 180
+    this.tank.angle = Turn.DOWN
   }
 
   private moveLeft () {
     this.tank.x -= 3
-    this.tank.angle = 270
+    this.tank.angle = Turn.LEFT
   }
 
   private moveRight () {
     this.tank.x += 3
-    this.tank.angle = 90
+    this.tank.angle = Turn.RIGHT
   }
 }
