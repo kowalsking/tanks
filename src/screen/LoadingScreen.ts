@@ -1,5 +1,5 @@
 import { Container, Sprite, Texture } from 'pixi.js'
-import { resizer, WIDTH, HEIGHT } from '../constants/sizes'
+import { resizer, WIDTH, HEIGHT } from '../constants/constants'
 import { Events } from '../enums/events'
 
 export default class LoadingScreen extends Container {
@@ -17,16 +17,13 @@ export default class LoadingScreen extends Container {
 
   private addScreen (texture: Texture) {
     this.screen.texture = texture
-    const container = new Container()
     this.screen.width = WIDTH
     this.screen.height = HEIGHT
-    container.addChild(this.screen)
-    this.addChild(container)
+    this.add(this.screen)
   }
 
   private addButton (texture: Texture) {
     this.button.texture = texture
-    const container = new Container()
     this.button.anchor.set(0.5)
     this.button.x = resizer.center.x
     this.button.y = resizer.center.y + this.button.height * 1.5
@@ -35,7 +32,12 @@ export default class LoadingScreen extends Container {
     this.button.on('pointerdown', () => {
       this.emit(Events.START)
     })
-    container.addChild(this.button)
+    this.add(this.button)
+  }
+
+  private add (entity: Sprite) {
+    const container = new Container()
+    container.addChild(entity)
     this.addChild(container)
   }
 

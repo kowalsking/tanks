@@ -11,6 +11,9 @@ export default class Loader extends PixiLoader {
     this.add('wall-4', '/assets/board/small_wall_4.png')
     this.add('wall', '/assets/board/wall.png')
     this.add('tank', '/assets/tanks/tank.png')
+    this.add('enemy_blue', '/assets/tanks/enemy_blue.png')
+    this.add('enemy_red', '/assets/tanks/enemy_red.png')
+    this.add('enemy_white', '/assets/tanks/enemy_white.png')
     this.load(() => onAssetsLoad())
   }
 

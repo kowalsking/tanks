@@ -1,6 +1,8 @@
 import { Container, Sprite, Texture } from 'pixi.js'
 import { Turn } from '../constants/constants'
-export default class Tank extends Container {
+import { HEIGHT, WIDTH } from '../constants/constants'
+
+export default class Enemy extends Container {
   private tank = new Sprite()
   private acceleration = 13
 
@@ -11,30 +13,10 @@ export default class Tank extends Container {
 
   public create () {
     this.tank.texture = this.texture
-    this.tank.x = 200
-    this.tank.y = 400
+    this.tank.x = Math.random() * WIDTH
+    this.tank.y = Math.random() * HEIGHT
     this.tank.anchor.set(0.5)
-    this.move()
     this.addChild(this.tank)
-  }
-
-  public move () {
-    window.addEventListener('keydown', e => {
-      switch (e.key) {
-        case 'ArrowUp':
-          this.moveUp()
-          break
-        case 'ArrowRight':
-          this.moveRight()
-          break
-        case 'ArrowDown':
-          this.moveDown()
-          break
-        case 'ArrowLeft':
-          this.moveLeft()
-          break
-      }
-    })
   }
 
   public moveUp () {
