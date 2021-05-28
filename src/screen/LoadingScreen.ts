@@ -1,6 +1,6 @@
 import { Container, Sprite, Texture } from 'pixi.js'
-import { resizer, WIDTH, HEIGHT } from '../constants/constants'
-import { Events } from '../enums/events'
+import { resizer, WIDTH, HEIGHT } from '../enums/enums'
+import { Events } from '../enums/enums'
 
 export default class LoadingScreen extends Container {
   private screen = new Sprite()

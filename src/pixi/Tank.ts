@@ -1,5 +1,5 @@
 import { Container, Sprite, Texture } from 'pixi.js'
-import { Turn } from '../constants/constants'
+import { Turn } from '../enums/enums'
 export default class Tank extends Container {
   private tank = new Sprite()
   private acceleration = 13
