@@ -50,17 +50,12 @@ export default class Game {
       
     this.scene.ticker.add((delta) => {
       enemies.forEach(enemy => {
-        enemy.moveDown()
+        // enemy.moveDown()
         this.battlefield.field.forEach(block => {
-          
-          if (
-              block.x < enemy.x + enemy.width &&
-              block.x + block.width > enemy.x &&
-              block.y < enemy.y + enemy.height &&
-              block.y + block.height > enemy.y
-            ) {
-            debugger
-            // return true
+          if (!enemy.checkCollision(block)) {
+            // enemy.moveUp()
+          } else {
+            console.log('BOOM')
           }
         })
       })

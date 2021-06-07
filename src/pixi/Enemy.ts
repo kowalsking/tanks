@@ -10,23 +10,15 @@ export default class Enemy extends Container {
   constructor (private texture: Texture, public enemyx: number, public enemyy: number) {
     super()
     this.create()
-    this.width = 24
-    this.height = 24
+    this.moveDown()
+    this.width = 32
+    this.height = 32
   }
 
   public create () {
-    this.tank.texture = Texture.WHITE
-    console.log(this.enemyx)
-    // this.tank.anchor.set(0.5)
-    // this.tank.position.set(0)
-    this.position.set(this.enemyx + 10, this.enemyy + 10)
-    // this.mask = new Graphics()
-    // .beginFill(0xffffff)
-    // .drawRect(this.x, this.y, this.height, this.width)
-    // .endFill();
-    // this.tank.anchor.set(0.5)
-    // this.x = this.x + this.tank.width / 2
-    // this.y = this.y + this.tank.height / 2
+    this.tank.texture = this.texture
+    this.tank.anchor.set(0.5)
+    this.position.set(this.enemyx - this.width / 2, this.enemyy - this.height / 2)
     this.addChild(this.tank)
   }
 
@@ -37,7 +29,7 @@ export default class Enemy extends Container {
 
   public moveDown () {
     this.y += this.acceleration
-    // this.angle = Turn.DOWN
+    this.angle = Turn.DOWN
   }
 
   public moveLeft () {
@@ -48,5 +40,12 @@ export default class Enemy extends Container {
   public moveRight () {
     this.tank.x += this.acceleration
     this.tank.angle = Turn.RIGHT
+  }
+
+  public checkCollision (block: Sprite) {
+    return block.x < this.x + this.width &&
+    block.x + block.width > this.x &&
+    block.y < this.y + this.height &&
+    block.y + block.height > this.y
   }
 }

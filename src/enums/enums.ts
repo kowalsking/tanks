@@ -1,5 +1,5 @@
-export const WIDTH = 1024
-export const HEIGHT = 768
+export const WIDTH = 900
+export const HEIGHT = 756
 export const ENEMY_COUNT = 10
 
 export const resizer = {

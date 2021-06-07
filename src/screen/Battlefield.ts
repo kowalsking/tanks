@@ -7,7 +7,7 @@ export default class Battlefield extends Container {
   public enemies: Enemy[] = []
   public map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 1],
+    [1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 1],
     [1, 0, 2, 2, 0, 0, 2, 2, 0, 0, 2, 2, 0, 2, 2, 0, 0, 2, 2, 0, 0, 2, 2, 0, 1],
     [1, 0, 2, 2, 0, 0, 2, 2, 0, 0, 2, 2, 0, 2, 2, 0, 0, 2, 2, 0, 0, 2, 2, 0, 1],
     [1, 0, 2, 2, 0, 0, 2, 2, 0, 0, 2, 2, 1, 2, 2, 0, 0, 2, 2, 0, 0, 2, 2, 0, 1],
@@ -38,7 +38,7 @@ export default class Battlefield extends Container {
         if (pieceName === '0') continue // empty
         piece = new Sprite(loader.getTexture(Map[this.map[i][j]]))
         if (pieceName === '6') {
-          const enemy = new Enemy(loader.getTexture('enemy_blue'), piece.height * j, piece.width * i)
+          const enemy = new Enemy(loader.getTexture('enemy_blue'), piece.height * j + piece.height / 2, piece.width * i + piece.width / 2)
           this.enemies.push(enemy)
           this.addChild(enemy)
           continue
