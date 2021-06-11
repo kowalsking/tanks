@@ -3,22 +3,26 @@ import { Turn } from '../enums/enums'
 export default class Tank extends Container {
   private tank = new Sprite()
   private acceleration = 13
-
-  constructor (private texture: Texture) {
-    super()
-    this.create()
+  private rot = 360 / 30
+  private a = 90
+  private pos = {
+    x: 0,
+    y: 0
   }
 
-  public create () {
-    this.tank.texture = this.texture
-    this.tank.x = 200
-    this.tank.y = 400
+  constructor () {
+    super()
+  }
+
+  public create (texture: Texture) {
+    this.tank.texture = texture
     this.tank.anchor.set(0.5)
-    this.move()
+    this.position.set(400, 500)
+    this.eventsHadler()
     this.addChild(this.tank)
   }
 
-  public move () {
+  public eventsHadler () {
     window.addEventListener('keydown', e => {
       switch (e.key) {
         case 'ArrowUp':
@@ -38,22 +42,25 @@ export default class Tank extends Container {
   }
 
   public moveUp () {
-    this.tank.y -= this.acceleration
-    this.tank.angle = Turn.UP
+    this.pos.x += 0.1
+    this.pos.y -= 0.1
+  }
+
+  public move () {
+    this.x += this.pos.x
+    this.y += this.pos.y
   }
 
   private moveDown () {
-    this.tank.y += this.acceleration
-    this.tank.angle = Turn.DOWN
+    this.pos.x -= 0.1
+    this.pos.y += 0.1
   }
 
   private moveLeft () {
-    this.tank.x -= this.acceleration
-    this.tank.angle = Turn.LEFT
+    this.angle -= this.rot
   }
 
   private moveRight () {
-    this.tank.x += this.acceleration
-    this.tank.angle = Turn.RIGHT
+    this.angle += this.rot
   }
 }

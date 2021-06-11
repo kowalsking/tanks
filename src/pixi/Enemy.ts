@@ -1,45 +1,40 @@
 import { Container, Graphics, Sprite, Texture } from 'pixi.js'
 import { Turn } from '../enums/enums'
-import { HEIGHT, WIDTH } from '../enums/enums'
 
 
 export default class Enemy extends Container {
   private tank = new Sprite()
   private acceleration = 1
+  public moving: boolean = false
+  public bullets: any[] = []
+  public pos = {
+    x: 0,
+    y: 1
+  }
+  public rotation: number = 0
+  public a = 90
 
   constructor (private texture: Texture, public enemyx: number, public enemyy: number) {
     super()
     this.create()
-    this.moveDown()
-    this.width = 32
-    this.height = 32
+    this.width = 16
+    this.height = 16
   }
 
   public create () {
-    this.tank.texture = this.texture
+    this.tank.texture = Texture.WHITE
     this.tank.anchor.set(0.5)
     this.position.set(this.enemyx - this.width / 2, this.enemyy - this.height / 2)
     this.addChild(this.tank)
   }
 
-  public moveUp () {
-    this.tank.y -= this.acceleration
-    this.tank.angle = Turn.UP
+  public move () {
+    this.x += this.pos.x
+    this.y += this.pos.y
   }
 
-  public moveDown () {
-    this.y += this.acceleration
-    this.angle = Turn.DOWN
-  }
-
-  public moveLeft () {
-    this.tank.x -= this.acceleration
-    this.tank.angle = Turn.LEFT
-  }
-
-  public moveRight () {
-    this.tank.x += this.acceleration
-    this.tank.angle = Turn.RIGHT
+  public rotate () {
+    this.angle += this.a
   }
 
   public checkCollision (block: Sprite) {

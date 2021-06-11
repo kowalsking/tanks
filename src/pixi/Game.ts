@@ -25,18 +25,8 @@ export default class Game {
   private start () {
     this.loadingScreen.hide()
     this.battlefield.create(this.loader)
-    this.tank = new Tank(this.loader.getTexture('tank'))
-    // this.createEnemies()
-    this.append([this.battlefield/*, this.tank*/])
+    this.append([this.battlefield])
   }
-
-  // private createEnemies () {
-  //   const textures = [this.loader.getTexture('enemy_blue'), this.loader.getTexture('enemy_red'), this.loader.getTexture('enemy_white')]
-  //   for (let i = 0; i < ENEMY_COUNT; i++) {
-  //     this.enemies.push(new Enemy(textures[Math.floor(Math.random() * textures.length)]))
-  //   }
-  //   this.append(this.enemies)
-  // }
 
   private handleEvents () {
     this.loadingScreen.on(Events.START, () => {
@@ -46,20 +36,33 @@ export default class Game {
   }
 
   private createTicker () {
-    const enemies = this.battlefield.enemies
-      
-    this.scene.ticker.add((delta) => {
-      enemies.forEach(enemy => {
-        // enemy.moveDown()
-        this.battlefield.field.forEach(block => {
-          if (!enemy.checkCollision(block)) {
-            // enemy.moveUp()
-          } else {
-            console.log('BOOM')
-          }
-        })
-      })
+    this.scene.ticker.add(() => {
+      this.checkCollision()
+      this.battlefield.tank.move()
     })
+  }
+
+  public checkCollision () {
+    this.battlefield.field.forEach(block => {
+      const tank = this.battlefield.tank
+      const dbp = this.distBetweenPoints(block.x, block.y, tank.x, tank.y)
+      const dbsr = tank.width / 2 + block.width / 2
+      const collision = this.checkCollision2(tank, block)
+      if (collision) {
+        console.log('BOOM') 
+      }
+    })
+  }
+
+  public checkCollision2 (entity: any, block: Sprite) {
+    return block.x < entity.x + entity.width &&
+    block.x + block.width > entity.x &&
+    block.y < entity.y + entity.height &&
+    block.y + block.height > entity.y
+  }
+
+  public distBetweenPoints(x1: number, y1: number, x2: number, y2: number) {
+    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
   }
 
   private append (child: DisplayObject[]) {
