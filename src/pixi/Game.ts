@@ -5,16 +5,11 @@ import LoadingScreen from '../screen/LoadingScreen'
 import { Events } from '../enums/enums'
 import { WIDTH, HEIGHT, ENEMY_COUNT } from '../enums/enums'
 import Battlefield from '../screen/Battlefield'
-import Tank from '../pixi/Tank'
-import Enemy from '../pixi/Enemy'
-
 export default class Game {
   private scene = new Scene(WIDTH, HEIGHT)
   private loader = new Loader(this.init.bind(this))
   private loadingScreen = new LoadingScreen()
   private battlefield = new Battlefield()
-  private tank: Tank | null = null
-  private enemies: Enemy[] | null = []
 
   private init () {
     this.loadingScreen.show(this.loader.getTexture('loading-screen'), this.loader.getTexture('start-button'))
@@ -37,24 +32,32 @@ export default class Game {
 
   private createTicker () {
     this.scene.ticker.add(() => {
-      this.checkCollision()
-      this.battlefield.tank.move()
+      this.update()
     })
   }
 
-  public checkCollision () {
-    this.battlefield.field.forEach(block => {
+  public update () {
+    this.battlefield.field.forEach((block, idx) => {
       const tank = this.battlefield.tank
-      const dbp = this.distBetweenPoints(block.x, block.y, tank.x, tank.y)
-      const dbsr = tank.width / 2 + block.width / 2
-      const collision = this.checkCollision2(tank, block)
+      const collision = this.checkCollision(tank, block)
+      tank.moveBullets()
       if (collision) {
-        console.log('BOOM') 
+        // console.log('BOOM')
+        // tank.moving = false
       }
+      tank.bullets.forEach((bullet, i) => {
+        const hit = this.checkCollision(bullet, block)
+        if (hit) {
+          this.battlefield.removeChild(block)
+          this.battlefield.field.splice(idx, 1)
+          tank.parent.removeChild(bullet)
+          tank.bullets.splice(i, 1)
+        }
+      })
     })
   }
 
-  public checkCollision2 (entity: any, block: Sprite) {
+  public checkCollision (entity: any, block: Sprite) {
     return block.x < entity.x + entity.width &&
     block.x + block.width > entity.x &&
     block.y < entity.y + entity.height &&

@@ -1,14 +1,9 @@
 import { Container, Sprite, Texture } from 'pixi.js'
-import { Turn } from '../enums/enums'
+import Bullet from './Bullet'
 export default class Tank extends Container {
   private tank = new Sprite()
-  private acceleration = 13
-  private rot = 360 / 30
-  private a = 90
-  private pos = {
-    x: 0,
-    y: 0
-  }
+  public moving = true
+  public bullets: Bullet[] = []
 
   constructor () {
     super()
@@ -26,41 +21,50 @@ export default class Tank extends Container {
     window.addEventListener('keydown', e => {
       switch (e.key) {
         case 'ArrowUp':
-          this.moveUp()
+          if (!this.moving) return
+          this.y -= 10
+          this.angle = 0
           break
         case 'ArrowRight':
-          this.moveRight()
-          break
-        case 'ArrowDown':
-          this.moveDown()
+          this.x += 10
+          this.angle = 90
           break
         case 'ArrowLeft':
-          this.moveLeft()
+          this.x -= 10
+          this.angle = 270
           break
+        case 'ArrowDown':
+          this.y += 10
+          this.angle = 180
+          break
+        case ' ':
+          this.shoot()
       }
     })
   }
 
-  public moveUp () {
-    this.pos.x += 0.1
-    this.pos.y -= 0.1
+  public shoot () {
+    let direction = 'up'
+    if (this.angle === 90) direction = 'right'
+    if (this.angle === 270) direction = 'left'
+    if (this.angle === 180) direction = 'down'
+    const bullet = new Bullet(direction)
+    bullet.position.set(this.x, this.y)
+    this.parent.addChild(bullet)
+    this.bullets.push(bullet)
   }
 
-  public move () {
-    this.x += this.pos.x
-    this.y += this.pos.y
-  }
-
-  private moveDown () {
-    this.pos.x -= 0.1
-    this.pos.y += 0.1
-  }
-
-  private moveLeft () {
-    this.angle -= this.rot
-  }
-
-  private moveRight () {
-    this.angle += this.rot
+  public moveBullets () {
+    this.bullets.forEach(bullet => {
+      if (bullet.direction === 'up') {
+        bullet.y -= .05
+      } else if (bullet.direction === 'left') {
+        bullet.x -= .05
+      } else if (bullet.direction === 'right') {
+        bullet.x += .05
+      } else if (bullet.direction === 'down') {
+        bullet.y += .05
+      }
+    })
   }
 }
