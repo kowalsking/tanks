@@ -19,9 +19,10 @@ export default class Tank extends Container {
 
   public eventsHadler () {
     window.addEventListener('keydown', e => {
+      // if (!this.moving) return
+
       switch (e.key) {
         case 'ArrowUp':
-          if (!this.moving) return
           this.y -= 10
           this.angle = 0
           break

@@ -75,7 +75,6 @@ export default class Battlefield extends Container {
           this.tank.create(loader.getTexture('tank'))
           this.addChild(this.tank)
         }
-
         piece.position.set(piece.height * j, piece.width * i)
         this.addChild(piece)
         this.field.push(piece)
