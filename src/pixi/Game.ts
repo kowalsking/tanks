@@ -38,12 +38,12 @@ export default class Game {
 
   public update () {
     this.battlefield.field.forEach((block, idx) => {
-        const tank = this.battlefield.tank
-        const collision = this.checkCollision(tank, block)
+      const tank = this.battlefield.tank
+      const collision = this.checkCollision(tank, block)
       tank.moveBullets()
       if (collision) {
         console.log('BOOM')
-        // tank.moving = false
+        tank.stop()
       }
       tank.bullets.forEach((bullet, i) => {
         const hit = this.checkCollision(bullet, block)

@@ -6,7 +6,10 @@ export default class Bullet extends Container {
   constructor (direction: string) {
     super()
     this.direction = direction
-    const texture = new Sprite(Texture.WHITE)
+
+    const texture = new Sprite(Texture.WHITE)    
+    texture.width = 10
+    texture.height = 10
     this.addChild(texture)
   }
 }

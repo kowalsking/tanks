@@ -19,10 +19,9 @@ export default class Tank extends Container {
 
   public eventsHadler () {
     window.addEventListener('keydown', e => {
-      // if (!this.moving) return
-
       switch (e.key) {
         case 'ArrowUp':
+          // collision
           this.y -= 10
           this.angle = 0
           break
@@ -30,13 +29,13 @@ export default class Tank extends Container {
           this.x += 10
           this.angle = 90
           break
-        case 'ArrowLeft':
-          this.x -= 10
-          this.angle = 270
-          break
         case 'ArrowDown':
           this.y += 10
           this.angle = 180
+          break
+        case 'ArrowLeft':
+          this.x -= 10
+          this.angle = 270
           break
         case ' ':
           this.shoot()
@@ -53,6 +52,26 @@ export default class Tank extends Container {
     bullet.position.set(this.x, this.y)
     this.parent.addChild(bullet)
     this.bullets.push(bullet)
+  }
+
+  public stop (): void {
+    if (this.angle === 0) {
+      this.y += 10
+    }
+    switch (this.angle) {
+      case 0:
+        this.y += 10
+        break
+      case 90:
+        this.x -= 10
+        break
+      case 180:
+        this.y -= 10
+        break
+      case 270:
+        this.x += 10
+        break
+    }
   }
 
   public moveBullets () {
