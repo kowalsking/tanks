@@ -5,11 +5,16 @@ import LoadingScreen from '../screen/LoadingScreen'
 import { Events } from '../enums/enums'
 import { WIDTH, HEIGHT, ENEMY_COUNT } from '../enums/enums'
 import Battlefield from '../screen/Battlefield'
+import Enemy from './Enemy'
+import Tank from './Tank'
+import Bullet from './Bullet'
+import EndGameScreen from '../screen/EndGameScreen'
 export default class Game {
   private scene = new Scene(WIDTH, HEIGHT)
   private loader = new Loader(this.init.bind(this))
   private loadingScreen = new LoadingScreen()
   private battlefield = new Battlefield()
+  private endGame = new EndGameScreen(this.scene.view.width, this.scene.view.height)
 
   private init () {
     this.loadingScreen.show(this.loader.getTexture('loading-screen'), this.loader.getTexture('start-button'))
@@ -39,29 +44,69 @@ export default class Game {
   public update () {
     this.battlefield.field.forEach((block, idx) => {
       const tank = this.battlefield.tank
-      const collision = this.checkCollision(tank, block)
+      const collision = this.checkCollision(tank, block, 5)
+      const enemies = this.battlefield.enemies
       tank.moveBullets()
       if (collision) {
-        console.log('BOOM')
         tank.stop()
       }
-      tank.bullets.forEach((bullet, i) => {
-        const hit = this.checkCollision(bullet, block)
-        if (hit) {
-          this.battlefield.removeChild(block)
-          this.battlefield.field.splice(idx, 1)
-          tank.parent.removeChild(bullet)
-          tank.bullets.splice(i, 1)
+      enemies.forEach(enemy => {
+        enemy.move()
+        enemy.moveBullets()
+        if (this.checkCollision(enemy, block, 10)) {
+          enemy.changeDirection()
         }
+        enemy.bullets.forEach((bullet, i) => {
+          if (this.checkCollision(bullet, tank, 5)) {
+            this.gameOver()
+          }
+          this.shootCollision(enemy, bullet, block, i, idx)
+
+        })
+      })
+
+      tank.bullets.forEach((bullet, i) => {
+        enemies.forEach((enemy, i) => {
+          if (this.checkCollision(bullet, enemy, 0)) {
+            enemies.splice(i, 1)
+            enemy.destroy()
+            this.battlefield.removeChild(enemy)
+          }
+        })
+        this.shootCollision(tank, bullet, block, i, idx)
+
       })
     })
   }
 
-  public checkCollision (entity: any, block: Sprite) {
-    return block.x < entity.x + entity.width &&
-    block.x + block.width > entity.x &&
-    block.y < entity.y + entity.height &&
-    block.y + block.height > entity.y
+  private shootCollision (tank: Tank | Enemy, bullet: Bullet, block: Sprite, i: number, idx: number) {
+    const hit = this.checkCollision(bullet, block, 5)
+    if (hit) {
+      if (block.name === 'wall') {
+        tank.parent.removeChild(bullet)
+        tank.bullets.splice(i, 1)
+        return
+      }
+      tank.parent.removeChild(bullet)
+      tank.bullets.splice(i, 1)
+      this.battlefield.removeChild(block)
+      this.battlefield.field.splice(idx, 1)
+    }
+  }
+
+  private gameOver () {
+    this.endGame.show(this.loader.getTexture('game_over'))
+    this.append([this.endGame])
+  }
+
+  public checkCollision (entity: any, block: any, offset: number) {
+    if (!block || !entity) {
+      debugger
+    }
+    return block.x < entity.x + entity.width + offset &&
+    block.x + block.width + offset > entity.x &&
+    block.y < entity.y + entity.height + offset &&
+    block.y + block.height + offset > entity.y
   }
 
   public distBetweenPoints(x1: number, y1: number, x2: number, y2: number) {

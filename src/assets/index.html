@@ -1,0 +1,614 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Canvas</title>
+        <meta charset="utf-8" />
+<!--		<script type="text/javascript" src="//code.jquery.com/jquery-latest.js"></script>
+		<script src="https://en.js.cx/libs/animate.js"></script>-->
+		<script src="pixi/pixi.min.js"></script>
+		<style>
+   body {
+            background-color: white;
+        }
+        canvas {
+            border:1px solid black;
+        }
+		</style>
+		
+    </head>
+<body>
+
+<script>
+
+//Aliases
+let Application = PIXI.Application,
+    Container = PIXI.Container,
+    loader = PIXI.loader,
+    resources = PIXI.loader.resources,
+    Graphics = PIXI.Graphics,
+    TextureCache = PIXI.utils.TextureCache,
+    Sprite = PIXI.Sprite,
+    Text = PIXI.Text,
+    TextStyle = PIXI.TextStyle;
+
+//Create a Pixi Application
+let app = new Application({ 
+    width: 1024, 
+    height: 768,  
+	  beginFill: 0x182437,
+    antialiasing: true, 
+    transparent: false, 
+    resolution: 1
+  }
+						  
+);
+
+//Add the canvas that Pixi automatically created for you to the HTML document
+document.body.appendChild(app.view);
+
+loader
+  //.add("images/treasureHunter.json")
+  .add("images/assets/tanks/tank.png")
+  .add("images/breek.png")
+	.add("images/dungeon.png")
+	.add("images/door.png")
+	.add("images/treasure.png")
+	.add("images/assets/tanks/enemy_red.png")
+	.add("images/assets/board/small_wall_1.png")
+	
+  .load(setup);
+
+//Define variables that might be used in more 
+//than one function
+let state, explorer, treasure, blobs, chimes, exit, player, dungeon,
+    door, breek, breek2, breek3, carrotTex, healthBar, message, gameScene, gameOverScene, startScene, enemies, id;
+
+function setup() {
+
+  //Make the game scene and add it to the stage
+  gameScene = new Container();
+  app.stage.addChild(gameScene);
+	app.renderer.backgroundColor = 0x061639;
+
+	
+
+  //Make the sprites and add them to the `gameScene`
+  //Create an alias for the texture atlas frame ids
+ //id = resources["images/treasureHunter.json"].textures;
+
+  //Dungeon
+  dungeon = new Sprite(resources["images/dungeon.png"].texture);
+  gameScene.addChild(dungeon);
+
+  //Door
+  door = new Sprite(resources["images/door.png"].texture); 
+  door.position.set(35, 35);
+  gameScene.addChild(door);
+
+    //breek
+  breek = new Sprite(resources["images/breek.png"].texture);
+breek.anchor.x = -0.5;  
+breek.anchor.y = 0.5;
+
+	breek.position.set(200, 150);
+  gameScene.addChild(breek);
+	
+  breek2 = new Sprite(resources["images/breek.png"].texture);
+breek2.anchor.x = -0.5;  
+breek2.anchor.y = 0.5;
+
+	breek2.position.set(500, 550);
+  gameScene.addChild(breek2);	
+breek3 = [];
+
+  //Make as many blobs as there are `numberOfBlobs`
+  for (let i = 0; i < 5; i++) {
+
+    //Make a blob
+    let breek3 = new Sprite(resources["images/assets/board/small_wall_1.png"].texture);
+breek3.anchor.x = -0.5;  
+breek3.anchor.y = 0.5;
+    //Space each blob horizontally according to the `spacing` value.
+    //`xOffset` determines the point from the left of the screen
+    //at which the first blob should be added
+  breek3.position.set(500, 600 + i * 18);
+    //Set the blob's position
+ 
+   // breek2.push(breek2);
+
+    //Add the blob to the `gameScene`
+    gameScene.addChild(breek3);
+  }	
+	
+  //Explorer
+  explorer = new Sprite(resources["images/assets/tanks/tank.png"].texture);
+explorer.backgroundColor = 0x256256;
+  explorer.anchor.set(0.5);
+//	explorer.anchor.x = 0.5;  
+//explorer.anchor.y = 0.5;
+  explorer.x = gameScene.height / 2 - explorer.height / 2 - 40;
+  explorer.y = 455;
+  explorer.vx = 0;
+  explorer.vy = 0;
+  
+  gameScene.addChild(explorer);
+  gameScene.interactive = true;
+
+gameScene.on("mouseup", function(e){  
+  shoot(explorer.rotation, {
+    x: explorer.position.x,
+    y: explorer.position.y
+  });
+})
+  //Treasure
+  treasure = new Sprite(resources["images/treasure.png"].texture);
+  treasure.x = gameScene.height / 2 - treasure.height / 2;
+  treasure.y = gameScene.width - treasure.width - 30;
+  gameScene.addChild(treasure);
+
+	
+
+var carrotTex = PIXI.Texture.fromImage("images/assets/bullet.png");
+
+var bullets = [];  
+var bulletSpeed = 8;
+	
+function shoot(rotation, startPosition){  
+  var bullet = new PIXI.Sprite(carrotTex);
+	bullet.anchor.set(0.5);
+  bullet.position.x = startPosition.x;
+  bullet.position.y = startPosition.y;
+  bullet.rotation = rotation;
+  gameScene.addChild(bullet);
+  bullets.push(bullet);
+}
+
+animate();  
+function animate() {  
+  requestAnimationFrame(animate);
+
+  for(var b=bullets.length-1;b>=0;b--){
+    bullets[b].position.x += Math.sin(bullets[b].rotation)*bulletSpeed;
+    bullets[b].position.y -= Math.cos(bullets[b].rotation)*bulletSpeed;
+  }
+  // render the container
+  app.render(gameScene);
+}	
+
+
+	
+
+	
+  //Make the blobs
+  let numberOfBlobs = 2,
+      spacing = 24,
+      yOffset = 300,
+      speed = 2,
+      direction = 1;
+
+  //An array to store all the blob monsters
+  blobs = [];
+
+  //Make as many blobs as there are `numberOfBlobs`
+  for (let i = 0; i < numberOfBlobs; i++) {
+
+    //Make a blob
+    let blob = new Sprite(resources["images/assets/tanks/enemy_red.png"].texture);
+
+    //Space each blob horizontally according to the `spacing` value.
+    //`xOffset` determines the point from the left of the screen
+    //at which the first blob should be added
+    let x = randomInt(0, app.stage.height - blob.height);
+
+    //Give the blob a random y position
+    let y = spacing * i + yOffset;
+
+    //Set the blob's position
+    blob.x = x;
+    blob.y = y;
+
+    //Set the blob's vertical velocity. `direction` will be either `1` or
+    //`-1`. `1` means the enemy will move down and `-1` means the blob will
+    //move up. Multiplying `direction` by `speed` determines the blob's
+    //vertical direction
+    blob.vx = speed * direction;
+blob.vy = speed * direction;
+    //Reverse the direction for the next blob
+    direction *= -1;
+
+    //Push the blob into the `blobs` array
+    blobs.push(blob);
+
+    //Add the blob to the `gameScene`
+    gameScene.addChild(blob);
+  }
+
+  //Create the health bar
+  healthBar = new Container();
+  healthBar.position.set(app.stage.width - 500, 12)
+  gameScene.addChild(healthBar);
+
+  //Create the black background rectangle
+  let innerBar = new Graphics();
+  innerBar.beginFill(0x000000);
+  innerBar.drawRect(0, 0, 128, 8);
+  innerBar.endFill(); 
+  healthBar.addChild(innerBar);
+
+  //Create the front red rectangle
+  let outerBar = new Graphics();
+  outerBar.beginFill(0xFF3300);
+  outerBar.drawRect(0, 0, 128, 8);
+  outerBar.endFill();
+  healthBar.addChild(outerBar);
+
+  healthBar.outer = outerBar;
+
+	
+
+	
+	
+  //Create the `gameOver` scene
+  gameOverScene = new Container();
+  app.stage.addChild(gameOverScene);
+
+  //Make the `gameOver` scene invisible when the game first starts
+  gameOverScene.visible = false;
+
+  //Create the text sprite and add it to the `gameOver` scene
+  let style = new TextStyle({
+    fontFamily: "Futura",
+    fontSize: 64,
+    fill: "white"
+  });
+  message = new Text("The End!", style);
+  message.x = 120;
+  message.y = app.stage.height / 2 - 32;
+  gameOverScene.addChild(message);
+	
+	//Create the `startScene` scene\
+	
+  startScene = new Container();
+  app.stage.addChild(startScene);
+  startScene.visible = true;
+	gameScene.visible = false;
+	 state = end;
+var someText = new window.PIXI.Text('press any key to start!',
+                {
+                    font: '32px Arial',
+                    fill: 0x939393,
+                    align: 'center',
+                    wordWrap: false
+                 
+                });
+	someText.x = 1024/2 -175;
+  someText.y = 768/2 -24;
+  startScene.addChild(someText);
+someText.interactive = true;
+someText.click = function (e) {
+startScene.visible = false;
+	gameScene.visible = true;
+};
+	
+  //Capture the keyboard arrow keys
+  let left = keyboard(37),
+      up = keyboard(38),
+      right = keyboard(39),
+      down = keyboard(40);
+
+  //Left arrow key `press` method
+  left.press = function() {
+
+    //Change the explorer's velocity when the key is pressed
+	explorer.rotation = -7.85;
+	
+    explorer.vx = -5;
+    explorer.vy = 0;
+  };
+
+  //Left arrow key `release` method
+  left.release = function() {
+
+    //If the left arrow has been released, and the right arrow isn't down,
+    //and the explorer isn't moving vertically:
+    //Stop the explorer
+    if (!right.isDown && explorer.vy === 0) {
+      explorer.vx = 0;
+    }
+  };
+
+  //Up
+  up.press = function() {
+	explorer.rotation = 0;
+	
+    explorer.vy = -5;
+    explorer.vx = 0;
+	  
+  };
+  up.release = function() {
+    if (!down.isDown && explorer.vx === 0) {
+      explorer.vy = 0;
+    }
+  };
+
+  //Right
+  right.press = function() {
+	//explorer.rotation = 7.85;
+explorer.rotation = Math.PI / 2;
+    explorer.vx = 5;
+    explorer.vy = 0;
+  };
+  right.release = function() {
+    if (!left.isDown && explorer.vy === 0) {
+      explorer.vx = 0;
+    }
+  };
+
+  //Down
+  down.press = function() {
+	explorer.rotation = 9.43;
+    explorer.vy = 5;
+    explorer.vx = 0;
+  };
+  down.release = function() {
+    if (!up.isDown && explorer.vx === 0) {
+      explorer.vy = 0;
+    }
+  };
+
+  //Set the game state
+  state = play;
+ 
+  //Start the game loop 
+  app.ticker.add(delta => gameLoop(delta));
+}
+
+
+function gameLoop(delta){
+
+  //Update the current game state:
+  state(delta);
+}
+
+function play(delta) {
+
+
+  //use the explorer's velocity to make it move
+  explorer.x += explorer.vx;
+  explorer.y += explorer.vy;
+
+  //Contain the explorer inside the area of the dungeon
+  contain(explorer, {x: 73, y: 75, width: 890, height: 720});
+	
+  //contain(explorer, stage);
+
+  //Set `explorerHit` to `false` before checking for a collision
+  let explorerHit = false;
+
+  //Loop through all the sprites in the `enemies` array
+  blobs.forEach(function(blob) {
+
+    //Move the blob
+	  blob.y -= Math.floor(Math.random() * blob.vy + Math.random());
+    blob.x += Math.floor(Math.random() + blob.vx);
+
+    //Check the blob's screen boundaries
+    let blobHitsWall = contain(blob, {x: 50, y: 24, width: 880, height: 720});
+
+    //If the blob hits the top or bottom of the stage, reverse
+    //its direction
+    if (blobHitsWall === "left" || blobHitsWall === "right") {
+      blob.vx *= -1;
+    }
+if (blobHitsWall === "top" || blobHitsWall === "bottom") {
+      blob.vy *= -1;
+    }
+    //Test for a collision. If any of the enemies are touching
+    //the explorer, set `explorerHit` to `true`
+    if(hitTestRectangle(explorer, blob)) {
+      explorerHit = true;
+    }
+  });
+	
+	
+
+  //If the explorer is hit...
+  if(explorerHit) {
+
+    //Make the explorer semi-transparent
+    explorer.alpha = 0.5;
+    //Reduce the width of the health bar's inner rectangle by 1 pixel
+    healthBar.outer.width -= 1;
+
+  } else {
+
+    //Make the explorer fully opaque (non-transparent) if it hasn't been hit
+    explorer.alpha = 1;
+  }
+
+  //Check for a collision between the explorer and the treasure
+  if (hitTestRectangle(explorer, treasure)) {
+
+    //If the treasure is touching the explorer, center it over the explorer
+    treasure.x = explorer.x - 2;
+    treasure.y = explorer.y - 15;
+  }
+  if (hitTestRectangle(explorer, breek)) {
+
+    //If the treasure is touching the explorer, center it over the explorer
+    explorer.x -= explorer.vx;
+    explorer.y -= explorer.vy;
+  }
+if (hitTestRectangle(explorer, breek2)) {
+
+    //If the treasure is touching the explorer, center it over the explorer
+    explorer.x -= explorer.vx;
+    explorer.y -= explorer.vy;
+  }
+	
+
+
+  //Does the explorer have enough health? If the width of the `innerBar`
+  //is less than zero, end the game and display "You lost!"
+  if (healthBar.outer.width < 0) {
+    state = end;
+    message.text = "You lost!";
+  }
+
+  //If the explorer has brought the treasure to the exit,
+  //end the game and display "You won!"
+  if (hitTestRectangle(treasure, door)) {
+    state = end;
+    message.text = "You won!";
+  } 
+
+ 
+}
+
+
+
+	
+function end() {
+  gameScene.visible = false;
+  gameOverScene.visible = true;
+
+
+}
+function start() {
+  gameScene.visible = false;
+  startScene.visible = true;
+}
+/* Helper functions */
+
+function contain(sprite, container) {
+
+  let collision = undefined;
+
+  //Left
+  if (sprite.x < container.x) {
+    sprite.x = container.x;
+    collision = "left";
+  }
+
+  //Top
+  if (sprite.y < container.y) {
+    sprite.y = container.y;
+    collision = "top";
+  }
+
+  //Right
+  if (sprite.x + sprite.width > container.width) {
+    sprite.x = container.width - sprite.width;
+    collision = "right";
+  }
+
+  //Bottom
+  if (sprite.y + sprite.height > container.height) {
+    sprite.y = container.height - sprite.height;
+    collision = "bottom";
+  }
+
+  //Return the `collision` value
+  return collision;
+}
+
+//The `hitTestRectangle` function
+function hitTestRectangle(r1, r2) {
+
+  //Define the variables we'll need to calculate
+  let hit, combinedHalfWidths, combinedHalfHeights, vx, vy;
+
+  //hit will determine whether there's a collision
+  hit = false;
+
+  //Find the center points of each sprite
+  r1.centerX = r1.x + r1.width / 2; 
+  r1.centerY = r1.y + r1.height / 2; 
+  r2.centerX = r2.x + r2.width / 2; 
+  r2.centerY = r2.y + r2.height / 2; 
+
+  //Find the half-widths and half-heights of each sprite
+  r1.halfWidth = r1.width / 2;
+  r1.halfHeight = r1.height / 2;
+  r2.halfWidth = r2.width / 2;
+  r2.halfHeight = r2.height / 2;
+
+  //Calculate the distance vector between the sprites
+  vx = r1.centerX - r2.centerX -32;
+  vy = r1.centerY - r2.centerY;
+
+  //Figure out the combined half-widths and half-heights
+  combinedHalfWidths = r1.halfWidth + r2.halfWidth;
+  combinedHalfHeights = r1.halfHeight + r2.halfHeight;
+
+  //Check for a collision on the x axis
+  if (Math.abs(vx) < combinedHalfWidths) {
+
+    //A collision might be occurring. Check for a collision on the y axis
+    if (Math.abs(vy) < combinedHalfHeights) {
+
+      //There's definitely a collision happening
+      hit = true;
+    } else {
+
+      //There's no collision on the y axis
+      hit = false;
+    }
+  } else {
+
+    //There's no collision on the x axis
+    hit = false;
+  }
+
+  //`hit` will be either `true` or `false`
+  return hit;
+};
+
+	
+//The `randomInt` helper function
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+//The `keyboard` helper function
+function keyboard(keyCode) {
+  var key = {};
+  key.code = keyCode;
+  key.isDown = false;
+  key.isUp = true;
+  key.press = undefined;
+  key.release = undefined;
+  //The `downHandler`
+  key.downHandler = function(event) {
+    if (event.keyCode === key.code) {
+      if (key.isUp && key.press) key.press();
+      key.isDown = true;
+      key.isUp = false;
+    }
+    event.preventDefault();
+  };
+
+  //The `upHandler`
+  key.upHandler = function(event) {
+    if (event.keyCode === key.code) {
+      if (key.isDown && key.release) key.release();
+      key.isDown = false;
+      key.isUp = true;
+    }
+    event.preventDefault();
+  };
+
+  //Attach event listeners
+  window.addEventListener(
+    "keydown", key.downHandler.bind(key), false
+  );
+  window.addEventListener(
+    "keyup", key.upHandler.bind(key), false
+  );
+  return key;
+}
+
+</script>
+</body>
+
+</html>

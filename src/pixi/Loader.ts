@@ -16,6 +16,7 @@ export default class Loader extends PixiLoader {
     this.add('enemy_blue', '/assets/tanks/enemy_blue.png')
     this.add('enemy_red', '/assets/tanks/enemy_red.png')
     this.add('enemy_white', '/assets/tanks/enemy_white.png')
+    this.add('game_over', '/assets/screens/gameover.jpg')
     this.load(() => onAssetsLoad())
   }
 

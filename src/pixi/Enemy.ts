@@ -1,46 +1,81 @@
-import { Container, Graphics, Sprite, Texture } from 'pixi.js'
-import { Turn } from '../enums/enums'
+import { Texture } from "pixi.js";
+import Bullet from "./Bullet";
+import Tank from "./Tank";
 
+export default class Enemy extends Tank {
+  public bullets: Bullet[] = []
+  private interval: any
 
-export default class Enemy extends Container {
-  private tank = new Sprite()
-  private acceleration = 1
-  public moving: boolean = false
-  public bullets: any[] = []
-  public pos = {
-    x: 0,
-    y: 1
-  }
-  public rotation: number = 0
-  public a = 90
-
-  constructor (private texture: Texture, public enemyx: number, public enemyy: number) {
+  constructor () {
     super()
-    this.create()
-    this.width = 16
-    this.height = 16
+    this.name = 'enemy'
   }
 
-  public create () {
-    this.tank.texture = Texture.WHITE
+  public create (texture: Texture, x: number, y: number) {
+    this.tank.texture = texture
     this.tank.anchor.set(0.5)
-    this.position.set(this.enemyx - this.width / 2, this.enemyy - this.height / 2)
+    this.height = this.width = this.tank.height = this.tank.width
+    this.position.set(x, y)
     this.addChild(this.tank)
+    this.shoot()
   }
 
-  public move () {
-    this.x += this.pos.x
-    this.y += this.pos.y
+  public move (): void {
+    switch (this.angle) {
+      case 0:
+        this.y -= 0.01
+        break
+      case 90:
+        this.x += 0.01
+        break
+      case 180:
+        this.y += 0.01
+        break
+      case 270:
+        this.x -= 0.01
+        break
+    }
   }
 
-  public rotate () {
-    this.angle += this.a
+  public shoot (): void {
+    this.interval = setInterval(() => {      
+      let direction = 'up'
+      if (this.angle === 90) direction = 'right'
+      if (this.angle === 270) direction = 'left'
+      if (this.angle === 180) direction = 'down'
+      const bullet = new Bullet(direction)
+      bullet.position.set(this.x, this.y)
+      this.parent.addChild(bullet)
+      this.bullets.push(bullet)
+    }, 1500)
   }
 
-  public checkCollision (block: Sprite) {
-    return block.x < this.x + this.width &&
-    block.x + block.width > this.x &&
-    block.y < this.y + this.height &&
-    block.y + block.height > this.y
+  public changeDirection () {
+    switch (this.angle) {
+      case 0:
+        this.angle = Math.random() > 0.5 ? 90 : 180
+        if (this.angle === 90) this.y += 1
+        break
+      case 90:
+        this.angle = Math.random() > 0.5 ? 270 : 180
+        if (this.angle === 180) this.x -= 1
+
+        break
+      case 180:
+        this.angle = Math.random() > 0.5 ? 270 : 0
+        if (this.angle === 270) this.y -= 1
+
+        break
+      case 270:
+        this.angle = Math.random() > 0.5 ? 0 : 90
+        if (this.angle === 0) this.x += 1
+
+        break
+    }
+  }
+
+  public destroy () {
+    super.destroy()
+    clearInterval(this.interval)
   }
 }

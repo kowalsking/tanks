@@ -1,7 +1,7 @@
 import { Container, Sprite, Texture } from 'pixi.js'
 import Bullet from './Bullet'
 export default class Tank extends Container {
-  private tank = new Sprite()
+  public tank = new Sprite()
   public moving = true
   public bullets: Bullet[] = []
 
@@ -9,10 +9,10 @@ export default class Tank extends Container {
     super()
   }
 
-  public create (texture: Texture) {
+  public create (texture: Texture, x = 400, y = 500) {
     this.tank.texture = texture
     this.tank.anchor.set(0.5)
-    this.position.set(400, 500)
+    this.position.set(x, y)
     this.eventsHadler()
     this.addChild(this.tank)
   }
@@ -21,21 +21,20 @@ export default class Tank extends Container {
     window.addEventListener('keydown', e => {
       switch (e.key) {
         case 'ArrowUp':
-          // collision
+          if (this.angle !== 0) return this.angle = 0
           this.y -= 10
-          this.angle = 0
           break
         case 'ArrowRight':
+          if (this.angle !== 90) return this.angle = 90
           this.x += 10
-          this.angle = 90
           break
         case 'ArrowDown':
+          if (this.angle !== 180) return this.angle = 180
           this.y += 10
-          this.angle = 180
           break
         case 'ArrowLeft':
+          if (this.angle !== 270) return this.angle = 270
           this.x -= 10
-          this.angle = 270
           break
         case ' ':
           this.shoot()
@@ -60,8 +59,7 @@ export default class Tank extends Container {
     }
     switch (this.angle) {
       case 0:
-        this.y += 10
-        break
+        return
       case 90:
         this.x -= 10
         break
@@ -86,5 +84,10 @@ export default class Tank extends Container {
         bullet.y += .05
       }
     })
+  }
+
+  public destroy () {
+    this.parent.removeChild(this)
+    super.destroy()
   }
 }
