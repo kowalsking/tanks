@@ -54,21 +54,21 @@ export default class Enemy extends Tank {
     switch (this.angle) {
       case 0:
         this.angle = Math.random() > 0.5 ? 90 : 180
-        if (this.angle === 90) this.y += 1
+        if (this.angle === 90) this.y += 5
         break
       case 90:
         this.angle = Math.random() > 0.5 ? 270 : 180
-        if (this.angle === 180) this.x -= 1
+        if (this.angle === 180) this.x -= 5
 
         break
       case 180:
         this.angle = Math.random() > 0.5 ? 270 : 0
-        if (this.angle === 270) this.y -= 1
+        if (this.angle === 270) this.y -= 5
 
         break
       case 270:
         this.angle = Math.random() > 0.5 ? 0 : 90
-        if (this.angle === 0) this.x += 1
+        if (this.angle === 0) this.x += 5
 
         break
     }

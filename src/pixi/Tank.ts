@@ -87,6 +87,8 @@ export default class Tank extends Container {
   }
 
   public destroy () {
+    this.bullets.forEach(b => this.parent.removeChild(b))
+    this.bullets = []
     this.parent.removeChild(this)
     super.destroy()
   }

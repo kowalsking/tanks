@@ -9,12 +9,14 @@ import Enemy from './Enemy'
 import Tank from './Tank'
 import Bullet from './Bullet'
 import EndGameScreen from '../screen/EndGameScreen'
+import { runInThisContext } from 'vm'
 export default class Game {
   private scene = new Scene(WIDTH, HEIGHT)
   private loader = new Loader(this.init.bind(this))
   private loadingScreen = new LoadingScreen()
   private battlefield = new Battlefield()
   private endGame = new EndGameScreen(this.scene.view.width, this.scene.view.height)
+  private play = true
 
   private init () {
     this.loadingScreen.show(this.loader.getTexture('loading-screen'), this.loader.getTexture('start-button'))
@@ -95,6 +97,8 @@ export default class Game {
   }
 
   private gameOver () {
+    if (!this.play) return
+    this.play = false
     this.endGame.show(this.loader.getTexture('game_over'))
     this.append([this.endGame])
   }
